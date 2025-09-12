@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "NewCogni",
+  "name": "new_cogni_collection",
   "type": "collection",
   "ignore": [
     "node_modules",

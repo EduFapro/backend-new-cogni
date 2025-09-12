@@ -1,20 +1,15 @@
 package com.example.services
 
-import com.example.models.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
+
+import com.example.models.Admin
+import org.slf4j.LoggerFactory
 
 class AdminService {
-    fun register(admin: AdminDTO): AdminDTO {
-        transaction {
-            Admins.insert {
-                it[fullName] = admin.fullName
-                it[dateOfBirth] = admin.dateOfBirth
-                it[specialty] = admin.specialty
-                it[cpf] = admin.cpf
-                it[username] = admin.username
-            }
-        }
+    private val logger = LoggerFactory.getLogger(AdminService::class.java)
+
+    fun register(admin: Admin): Admin {
+        // Apenas loga por enquanto
+        logger.info("📥 Registrando admin: {}", admin)
         return admin
     }
 }
