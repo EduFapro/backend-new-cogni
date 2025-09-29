@@ -5,27 +5,44 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
-
 
 fun Route.adminRoutes(service: AdminService) {
     val logger = LoggerFactory.getLogger("AdminRoutes")
 
     route("/admin") {
         post("/register") {
-            val raw = call.receiveText()
-            println("RAW recebido: $raw")
+            val admin = try {
+                call.receive<AdminDTO>()
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf("error" to "Invalid JSON: ${e.message}")
+                )
+                return@post
+            }
 
-            val admin = Json { ignoreUnknownKeys = true }
-                .decodeFromString<Admin>(raw)
-            println("Desserializado manual: $admin")
+            val missingFields = admin.validateRequiredFields()
+            if (missingFields.isNotEmpty()) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf(
+                        "error" to "Missing required fields",
+                        "missing" to missingFields
+                    )
+                )
+                return@post
+            }
 
-
-            println("📥 Body recebido: $admin")
             logger.info("Novo admin recebido: {}", admin)
-            call.respond(HttpStatusCode.OK, "Admin recebido com sucesso ✅")
-        }
 
+            // ✅ If everything is valid, delegate to service
+            service.register(admin)
+
+            call.respond(
+                HttpStatusCode.OK,
+                mapOf("message" to "Admin registrado com sucesso ✅")
+            )
+        }
     }
 }
