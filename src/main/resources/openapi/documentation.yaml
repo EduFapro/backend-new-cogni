@@ -1,0 +1,838 @@
+openapi: 3.0.3
+info:
+  title: Cogni Backend API
+  description: Backend API for the Segundo Cogni cognitive evaluation application
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@cogni.example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Evaluators
+    description: Operations related to evaluators
+  - name: Participants
+    description: Operations related to participants
+  - name: Evaluations
+    description: Operations related to evaluations
+  - name: Module Instances
+    description: Operations related to module instances
+  - name: Task Instances
+    description: Operations related to task instances
+  - name: Recording Files
+    description: Operations related to recording file metadata
+
+paths:
+  # Evaluator endpoints
+  /api/evaluators:
+    post:
+      tags:
+        - Evaluators
+      summary: Create a new evaluator
+      operationId: createEvaluator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evaluator'
+      responses:
+        '201':
+          description: Evaluator created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/evaluators/{id}:
+    get:
+      tags:
+        - Evaluators
+      summary: Get evaluator by ID
+      operationId: getEvaluatorById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluator found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluator'
+        '404':
+          description: Evaluator not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Evaluators
+      summary: Update evaluator
+      operationId: updateEvaluator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evaluator'
+      responses:
+        '200':
+          description: Evaluator updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Evaluator not found
+
+    delete:
+      tags:
+        - Evaluators
+      summary: Delete evaluator
+      operationId: deleteEvaluator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluator deleted successfully
+        '404':
+          description: Evaluator not found
+
+  # Participant endpoints
+  /api/participants:
+    post:
+      tags:
+        - Participants
+      summary: Create a new participant
+      operationId: createParticipant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participant'
+      responses:
+        '201':
+          description: Participant created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+        '400':
+          description: Invalid request
+
+    get:
+      tags:
+        - Participants
+      summary: Get participants by evaluator ID
+      operationId: getParticipantsByEvaluator
+      parameters:
+        - name: evaluatorId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of participants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Participant'
+
+  /api/participants/{id}:
+    get:
+      tags:
+        - Participants
+      summary: Get participant by ID
+      operationId: getParticipantById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Participant found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '404':
+          description: Participant not found
+
+    put:
+      tags:
+        - Participants
+      summary: Update participant
+      operationId: updateParticipant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participant'
+      responses:
+        '200':
+          description: Participant updated successfully
+        '404':
+          description: Participant not found
+
+    delete:
+      tags:
+        - Participants
+      summary: Delete participant
+      operationId: deleteParticipant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Participant deleted successfully
+        '404':
+          description: Participant not found
+
+  # Evaluation endpoints
+  /api/evaluations:
+    post:
+      tags:
+        - Evaluations
+      summary: Create a new evaluation
+      operationId: createEvaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evaluation'
+      responses:
+        '201':
+          description: Evaluation created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+
+  /api/evaluations/{id}:
+    get:
+      tags:
+        - Evaluations
+      summary: Get evaluation by ID
+      operationId: getEvaluationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluation'
+        '404':
+          description: Evaluation not found
+
+    put:
+      tags:
+        - Evaluations
+      summary: Update evaluation
+      operationId: updateEvaluation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evaluation'
+      responses:
+        '200':
+          description: Evaluation updated successfully
+
+  /api/evaluations/{id}/status:
+    patch:
+      tags:
+        - Evaluations
+      summary: Update evaluation status
+      operationId: updateEvaluationStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: integer
+                  description: Status (1=Pending, 2=InProgress, 3=Completed)
+                  minimum: 1
+                  maximum: 3
+      responses:
+        '200':
+          description: Status updated successfully
+
+  # Module Instance endpoints
+  /api/module-instances:
+    post:
+      tags:
+        - Module Instances
+      summary: Create a new module instance
+      operationId: createModuleInstance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleInstance'
+      responses:
+        '201':
+          description: Module instance created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+
+    get:
+      tags:
+        - Module Instances
+      summary: Get module instances by evaluation ID
+      operationId: getModuleInstancesByEvaluation
+      parameters:
+        - name: evaluationId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of module instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleInstance'
+
+  /api/module-instances/{id}:
+    get:
+      tags:
+        - Module Instances
+      summary: Get module instance by ID
+      operationId: getModuleInstanceById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Module instance found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleInstance'
+
+    delete:
+      tags:
+        - Module Instances
+      summary: Delete module instance
+      operationId: deleteModuleInstance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Module instance deleted successfully
+
+  /api/module-instances/{id}/status:
+    patch:
+      tags:
+        - Module Instances
+      summary: Update module instance status
+      operationId: updateModuleInstanceStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: integer
+                  minimum: 1
+                  maximum: 3
+      responses:
+        '200':
+          description: Status updated successfully
+
+  # Task Instance endpoints
+  /api/task-instances:
+    post:
+      tags:
+        - Task Instances
+      summary: Create a new task instance
+      operationId: createTaskInstance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInstance'
+      responses:
+        '201':
+          description: Task instance created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+
+    get:
+      tags:
+        - Task Instances
+      summary: Get task instances by module instance ID
+      operationId: getTaskInstancesByModuleInstance
+      parameters:
+        - name: moduleInstanceId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of task instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskInstance'
+
+  /api/task-instances/{id}:
+    get:
+      tags:
+        - Task Instances
+      summary: Get task instance by ID
+      operationId: getTaskInstanceById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task instance found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInstance'
+
+    delete:
+      tags:
+        - Task Instances
+      summary: Delete task instance
+      operationId: deleteTaskInstance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task instance deleted successfully
+
+  /api/task-instances/{id}/complete:
+    patch:
+      tags:
+        - Task Instances
+      summary: Mark task instance as completed
+      operationId: completeTaskInstance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                duration:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Task marked as completed
+
+  # Recording File endpoints
+  /api/recordings:
+    post:
+      tags:
+        - Recording Files
+      summary: Create recording file metadata
+      operationId: createRecordingFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordingFile'
+      responses:
+        '201':
+          description: Recording file created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+
+  /api/recordings/{id}:
+    get:
+      tags:
+        - Recording Files
+      summary: Get recording file by ID
+      operationId: getRecordingFileById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recording file found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordingFile'
+
+    delete:
+      tags:
+        - Recording Files
+      summary: Delete recording file
+      operationId: deleteRecordingFile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recording file deleted successfully
+
+  /api/recordings/metadata/{taskInstanceId}:
+    get:
+      tags:
+        - Recording Files
+      summary: Get recording file by task instance ID
+      operationId: getRecordingFileByTaskInstance
+      parameters:
+        - name: taskInstanceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recording file found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordingFile'
+        '404':
+          description: Recording file not found
+
+components:
+  schemas:
+    Evaluator:
+      type: object
+      required:
+        - name
+        - surname
+        - email
+        - birthDate
+        - specialty
+        - cpfOrNif
+        - username
+        - password
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          example: "John"
+        surname:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        birthDate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        specialty:
+          type: string
+          example: "Psychology"
+        cpfOrNif:
+          type: string
+          example: "12345678900"
+        username:
+          type: string
+          example: "johndoe"
+        password:
+          type: string
+          format: password
+          example: "hashedpassword123"
+        firstLogin:
+          type: boolean
+          default: true
+        isAdmin:
+          type: boolean
+          default: false
+
+    Participant:
+      type: object
+      required:
+        - name
+        - surname
+        - birthDate
+        - sex
+        - educationLevel
+        - laterality
+        - evaluatorId
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          example: "Jane"
+        surname:
+          type: string
+          example: "Smith"
+        birthDate:
+          type: string
+          format: date
+          example: "1985-05-15"
+        sex:
+          type: integer
+          description: "1=Male, 2=Female, 3=Other"
+          minimum: 1
+          maximum: 3
+          example: 2
+        educationLevel:
+          type: integer
+          example: 3
+        laterality:
+          type: integer
+          description: "1=Right, 2=Left, 3=Both"
+          minimum: 1
+          maximum: 3
+          example: 1
+        evaluatorId:
+          type: integer
+          example: 1
+
+    Evaluation:
+      type: object
+      required:
+        - evaluatorId
+        - participantId
+        - evaluationDate
+        - language
+      properties:
+        id:
+          type: integer
+          nullable: true
+        evaluatorId:
+          type: integer
+          example: 1
+        participantId:
+          type: integer
+          example: 1
+        evaluationDate:
+          type: string
+          format: date-time
+          example: "2025-11-28T10:30:00Z"
+        status:
+          type: integer
+          description: "1=Pending, 2=InProgress, 3=Completed"
+          minimum: 1
+          maximum: 3
+          default: 1
+        language:
+          type: integer
+          example: 1
+
+    ModuleInstance:
+      type: object
+      required:
+        - moduleId
+        - evaluationId
+      properties:
+        id:
+          type: integer
+          nullable: true
+        moduleId:
+          type: integer
+          example: 1
+        evaluationId:
+          type: integer
+          example: 1
+        status:
+          type: integer
+          description: "1=Pending, 2=InProgress, 3=Completed"
+          minimum: 1
+          maximum: 3
+          default: 1
+
+    TaskInstance:
+      type: object
+      required:
+        - taskId
+        - moduleInstanceId
+      properties:
+        id:
+          type: integer
+          nullable: true
+        taskId:
+          type: integer
+          example: 1
+        moduleInstanceId:
+          type: integer
+          example: 1
+        status:
+          type: integer
+          description: "1=Pending, 2=InProgress, 3=Completed"
+          minimum: 1
+          maximum: 3
+          default: 1
+        completingTime:
+          type: string
+          nullable: true
+          example: "00:05:30"
+
+    RecordingFile:
+      type: object
+      required:
+        - taskInstanceId
+        - filePath
+      properties:
+        id:
+          type: integer
+          nullable: true
+        taskInstanceId:
+          type: integer
+          example: 1
+        filePath:
+          type: string
+          example: "/recordings/task_1_recording.webm"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        missing:
+          type: array
+          items:
+            type: string

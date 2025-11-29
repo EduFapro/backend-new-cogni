@@ -30,6 +30,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
+    
+    // OpenAPI and Swagger
+    implementation("io.ktor:ktor-server-openapi")
+    implementation("io.ktor:ktor-server-swagger")
 
     // Exposed
     implementation("org.jetbrains.exposed:exposed-core:0.61.0")
