@@ -1,35 +1,16 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:15
-    container_name: cogni-db
+    image: postgres:16
+    container_name: cogni_postgres
     restart: always
     environment:
-      POSTGRES_USER: cogni_user
-      POSTGRES_PASSWORD: secret123
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: cogni_db
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  backend:
-    build: .
-    container_name: cogni-backend
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: cogni_db
-      DB_USER: cogni_user
-      DB_PASSWORD: secret123
-    ports:
-      - "8080:8080"
-    volumes:
-      - .:/app
-    command: ["./gradlew", "run"] # or `./gradlew run --no-daemon` depending on your Gradle setup
+      - db_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  db_data:

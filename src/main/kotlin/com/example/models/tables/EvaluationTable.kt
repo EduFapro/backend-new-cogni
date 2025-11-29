@@ -1,0 +1,15 @@
+package com.example.models.tables
+
+import org.jetbrains.exposed.sql.Table
+
+object EvaluationTable : Table("evaluations") {
+    val id = integer("id").autoIncrement()
+    val evaluatorId = integer("evaluator_id").references(EvaluatorTable.id)
+    val participantId = integer("participant_id").references(ParticipantTable.id)
+    val evaluationDate = varchar("evaluation_date", 50) // ISO datetime string
+    val status = integer("status").default(1) // 1=Pending, 2=InProgress, 3=Completed
+    val language = integer("language") // language code
+
+    override val primaryKey = PrimaryKey(id)
+}
+
