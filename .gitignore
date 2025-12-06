@@ -70,3 +70,6 @@ $RECYCLE.BIN/
 
 # Linux
 *~
+# Secrets
+.env
+.env.*

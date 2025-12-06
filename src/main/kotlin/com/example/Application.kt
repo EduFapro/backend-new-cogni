@@ -9,6 +9,7 @@ fun main() {
         configureSerialization()
         configureDatabase()
         configureSecurity()
+        configureMonitoring()
         configureOpenAPI()
         configureRouting()
     }.start(wait = true)

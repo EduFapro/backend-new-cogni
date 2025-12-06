@@ -8,8 +8,18 @@ RUN gradle clean shadowJar -x test
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+# Create a non-root user
+RUN addgroup --system --gid 1001 appgroup && \
+    adduser --system --uid 1001 --ingroup appgroup appuser
+
 # Copiar o JAR gerado pelo Gradle (ajustar nome se diferente)
 COPY --from=build /app/build/libs/*-all.jar app.jar
+
+# Change ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch user
+USER appuser
 
 EXPOSE 8080
 

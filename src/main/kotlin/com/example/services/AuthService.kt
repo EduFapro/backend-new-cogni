@@ -33,6 +33,7 @@ class AuthService {
             .withIssuer(jwtIssuer)
             .withClaim("username", username)
             .withClaim("id", user[EvaluatorTable.id])
+            .withClaim("isAdmin", user[EvaluatorTable.isAdmin])
             .withExpiresAt(Date(System.currentTimeMillis() + 60000 * 60 * 2)) // 2 hours
             .sign(Algorithm.HMAC256(jwtSecret))
     }

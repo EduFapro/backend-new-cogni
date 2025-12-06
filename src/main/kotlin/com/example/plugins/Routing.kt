@@ -10,6 +10,9 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 
 import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import io.ktor.http.HttpStatusCode
 import io.github.cdimascio.dotenv.dotenv
 
 fun Route.protectedRoute(callback: Route.() -> Unit) {
@@ -20,6 +23,27 @@ fun Route.protectedRoute(callback: Route.() -> Unit) {
         callback()
     } else {
         authenticate("auth-jwt") {
+            callback()
+        }
+    }
+}
+
+fun Route.protectedAdminRoute(callback: Route.() -> Unit) {
+    val dotenv = dotenv { ignoreIfMissing = true }
+    val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
+
+    if (devMode) {
+        callback()
+    } else {
+        authenticate("auth-jwt") {
+            intercept(ApplicationCallPipeline.Call) {
+                val principal = call.principal<io.ktor.server.auth.jwt.JWTPrincipal>()
+                val isAdmin = principal?.payload?.getClaim("isAdmin")?.asBoolean() ?: false
+                if (!isAdmin) {
+                    call.respond(io.ktor.http.HttpStatusCode.Forbidden, mapOf("error" to "Admin access required"))
+                    finish()
+                }
+            }
             callback()
         }
     }

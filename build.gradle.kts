@@ -52,8 +52,18 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("org.mindrot:jbcrypt:0.4")
 
+    // Monitoring & Validation
+    implementation("io.ktor:ktor-server-status-pages")
+    implementation("io.ktor:ktor-server-rate-limit")
+    implementation("io.ktor:ktor-server-call-logging")
+
     // Testing
     testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-test-host:$ktor")
     testImplementation("io.mockk:mockk:1.13.10")
+}
+
+tasks.test {
+    environment("DEV_MODE", "true")
+    useJUnitPlatform()
 }
