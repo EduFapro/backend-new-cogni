@@ -1,4 +1,19 @@
 services:
+  app:
+    build: .
+    container_name: cogni_backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/cogni_db
+      DB_USER: admin
+      DB_PASSWORD: admin
+    depends_on:
+      - db
+    restart: always
+
   db:
     image: postgres:16
     container_name: cogni_postgres

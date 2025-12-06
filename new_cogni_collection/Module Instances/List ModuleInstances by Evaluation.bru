@@ -1,0 +1,28 @@
+meta {
+  name: List ModuleInstances by Evaluation
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/api/module-instances?evaluationId=1
+  body: json
+  auth: inherit
+}
+
+params:query {
+  evaluationId: 1
+}
+
+body:json {
+  {
+    "evaluationId": 1,
+    "moduleId": 1,
+    "status": 1,
+    "startTime": "2023-10-27T10:00:00"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

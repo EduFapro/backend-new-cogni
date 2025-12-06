@@ -1,0 +1,30 @@
+meta {
+  name: Create Evaluator
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/api/evaluators
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "John",
+    "surname": "Doe",
+    "email": "john.doe@example.com",
+    "birthDate": "1990-01-01",
+    "specialty": "Psychology",
+    "cpfOrNif": "12345678900",
+    "username": "johndoe",
+    "password": "password123",
+    "firstLogin": true,
+    "isAdmin": false
+  }
+}
+
+settings {
+  encodeUrl: true
+}

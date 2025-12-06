@@ -9,6 +9,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.slf4j.LoggerFactory
 
+import kotlinx.serialization.json.*
+
 fun Route.recordingFileRoutes(service: RecordingFileService) {
     val logger = LoggerFactory.getLogger("RecordingFileRoutes")
 
@@ -27,7 +29,10 @@ fun Route.recordingFileRoutes(service: RecordingFileService) {
                 }
 
                 val id = service.create(recordingFile)
-                call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Recording file created successfully"))
+                call.respond(HttpStatusCode.Created, buildJsonObject {
+                    put("id", id)
+                    put("message", "Recording file created successfully")
+                })
             } catch (e: Exception) {
                 logger.error("Error creating recording file", e)
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Failed to create recording file: ${e.message}"))

@@ -10,6 +10,8 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 
+import kotlinx.serialization.json.*
+
 @Serializable
 data class StatusUpdate(val status: Int)
 
@@ -31,7 +33,10 @@ fun Route.evaluationRoutes(service: EvaluationService) {
                 }
 
                 val id = service.create(evaluation)
-                call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Evaluation created successfully"))
+                call.respond(HttpStatusCode.Created, buildJsonObject {
+                    put("id", id)
+                    put("message", "Evaluation created successfully")
+                })
             } catch (e: Exception) {
                 logger.error("Error creating evaluation", e)
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Failed to create evaluation: ${e.message}"))

@@ -10,6 +10,8 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 
+import kotlinx.serialization.json.*
+
 @Serializable
 data class ModuleStatusUpdate(val status: Int)
 
@@ -31,7 +33,10 @@ fun Route.moduleInstanceRoutes(service: ModuleInstanceService) {
                 }
 
                 val id = service.create(moduleInstance)
-                call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Module instance created successfully"))
+                call.respond(HttpStatusCode.Created, buildJsonObject {
+                    put("id", id)
+                    put("message", "Module instance created successfully")
+                })
             } catch (e: Exception) {
                 logger.error("Error creating module instance", e)
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Failed to create module instance: ${e.message}"))

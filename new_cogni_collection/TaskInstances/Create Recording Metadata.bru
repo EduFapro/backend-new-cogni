@@ -1,0 +1,25 @@
+meta {
+  name: Create Recording Metadata
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/recordings
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "taskInstanceId": 1,
+    "filePath": "/data/recordings/rec_001.mp4",
+    "fileSize": 1024000,
+    "duration": "120s",
+    "createdAt": "2023-10-27T10:07:00"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.1.20"           // Kotlin 2.x for Ktor 3
+    kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
 }
 
@@ -47,5 +48,12 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:1.5.18")
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
-    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-auth-jwt")
+    implementation("org.mindrot:jbcrypt:0.4")
+
+    // Testing
+    testImplementation(kotlin("test"))
+    testImplementation("io.ktor:ktor-server-test-host:$ktor")
+    testImplementation("io.mockk:mockk:1.13.10")
 }

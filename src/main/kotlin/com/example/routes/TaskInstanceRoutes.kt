@@ -10,6 +10,8 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 
+import kotlinx.serialization.json.*
+
 @Serializable
 data class TaskCompletionUpdate(val duration: String? = null)
 
@@ -31,7 +33,10 @@ fun Route.taskInstanceRoutes(service: TaskInstanceService) {
                 }
 
                 val id = service.create(taskInstance)
-                call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Task instance created successfully"))
+                call.respond(HttpStatusCode.Created, buildJsonObject {
+                    put("id", id)
+                    put("message", "Task instance created successfully")
+                })
             } catch (e: Exception) {
                 logger.error("Error creating task instance", e)
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Failed to create task instance: ${e.message}"))

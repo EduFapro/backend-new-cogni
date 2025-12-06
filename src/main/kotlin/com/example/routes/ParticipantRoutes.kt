@@ -7,6 +7,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.*
 import org.slf4j.LoggerFactory
 
 fun Route.participantRoutes(service: ParticipantService) {
@@ -27,7 +28,10 @@ fun Route.participantRoutes(service: ParticipantService) {
                 }
 
                 val id = service.create(participant)
-                call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Participant created successfully"))
+                call.respond(HttpStatusCode.Created, buildJsonObject {
+                    put("id", id)
+                    put("message", "Participant created successfully")
+                })
             } catch (e: Exception) {
                 logger.error("Error creating participant", e)
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Failed to create participant: ${e.message}"))

@@ -6,12 +6,36 @@ import com.example.routes.*
 import com.example.services.*
 import io.ktor.server.application.*
 import io.ktor.server.response.respondText
+import io.ktor.server.response.respond
 import io.ktor.server.routing.*
+
+import io.ktor.server.auth.authenticate
+import io.github.cdimascio.dotenv.dotenv
+
+fun Route.protectedRoute(callback: Route.() -> Unit) {
+    val dotenv = dotenv { ignoreIfMissing = true }
+    val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
+
+    if (devMode) {
+        callback()
+    } else {
+        authenticate("auth-jwt") {
+            callback()
+        }
+    }
+}
 
 fun Application.configureRouting() {
     routing {
         get("/") {
             call.respondText("Servidor funcionando ✅", ContentType.Text.Plain)
+        }
+
+        get("/api/status") {
+            val dotenv = dotenv { ignoreIfMissing = true }
+            val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
+            val mode = if (devMode) "DEV" else "PROD"
+            call.respond(mapOf("status" to "ok", "mode" to mode))
         }
         
         // Admin routes (existing)

@@ -1,0 +1,21 @@
+meta {
+  name: Patch Evaluation
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:8080/api/evaluations/1/status
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": 2
+  }
+}
+
+settings {
+  encodeUrl: true
+}

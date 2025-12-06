@@ -1,0 +1,27 @@
+meta {
+  name: Get Participant
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/api/participants/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Alice",
+    "surname": "Smith",
+    "birthDate": "2015-05-20",
+    "sex": 2,
+    "educationLevel": 1,
+    "laterality": 1,
+    "evaluatorId": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Create ModuleInstance
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/module-instances
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "evaluationId": 1,
+    "moduleId": 1,
+    "status": 1,
+    "startTime": "2023-10-27T10:00:00"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

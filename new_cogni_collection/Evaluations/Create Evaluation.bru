@@ -1,0 +1,25 @@
+meta {
+  name: Create Evaluation
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/evaluations
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "participantId": 0,
+    "evaluatorId": 0,
+    "evaluationDate": "2023-10-27T10:00:00",
+    "status": 1,
+    "language": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}
