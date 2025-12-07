@@ -17,9 +17,10 @@ import io.github.cdimascio.dotenv.dotenv
 
 fun Route.protectedRoute(callback: Route.() -> Unit) {
     val dotenv = dotenv { ignoreIfMissing = true }
-    val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
+    val appMode = dotenv["APP_MODE"]?.lowercase() ?: "local"
+    val isDev = appMode == "local"
 
-    if (devMode) {
+    if (isDev) {
         callback()
     } else {
         authenticate("auth-jwt") {
@@ -30,9 +31,10 @@ fun Route.protectedRoute(callback: Route.() -> Unit) {
 
 fun Route.protectedAdminRoute(callback: Route.() -> Unit) {
     val dotenv = dotenv { ignoreIfMissing = true }
-    val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
+    val appMode = dotenv["APP_MODE"]?.lowercase() ?: "local"
+    val isDev = appMode == "local"
 
-    if (devMode) {
+    if (isDev) {
         callback()
     } else {
         authenticate("auth-jwt") {
@@ -57,8 +59,8 @@ fun Application.configureRouting() {
 
         get("/api/status") {
             val dotenv = dotenv { ignoreIfMissing = true }
-            val devMode = dotenv["DEV_MODE"]?.toBoolean() ?: false
-            val mode = if (devMode) "DEV" else "PROD"
+            val appMode = dotenv["APP_MODE"]?.lowercase() ?: "local"
+            val mode = if (appMode == "local") "DEV (Local)" else "PROD (Remote)"
             call.respond(mapOf("status" to "ok", "mode" to mode))
         }
         
@@ -66,8 +68,20 @@ fun Application.configureRouting() {
         adminRoutes(AdminService())
         
         // New API routes
+        // New API routes
         evaluatorRoutes(EvaluatorService())
-        participantRoutes(ParticipantService())
+        
+        val evaluationService = EvaluationService()
+        val moduleInstanceService = ModuleInstanceService()
+        val taskInstanceService = TaskInstanceService()
+        val templateService = TemplateService()
+        
+        participantRoutes(ParticipantService(
+            evaluationService, 
+            moduleInstanceService, 
+            taskInstanceService, 
+            templateService
+        ))
         evaluationRoutes(EvaluationService())
         moduleInstanceRoutes(ModuleInstanceService())
         taskInstanceRoutes(TaskInstanceService())

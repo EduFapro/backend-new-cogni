@@ -15,7 +15,7 @@ import com.example.plugins.protectedRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginDTO(val username: String, val password: String)
+data class LoginDTO(val email: String, val password: String)
 
 fun Route.evaluatorRoutes(service: EvaluatorService) {
     val logger = LoggerFactory.getLogger("EvaluatorRoutes")
@@ -31,7 +31,7 @@ fun Route.evaluatorRoutes(service: EvaluatorService) {
                 return@post
             }
 
-            val token = authService.login(loginRequest.username, loginRequest.password)
+            val token = authService.login(loginRequest.email, loginRequest.password)
             if (token != null) {
                 call.respond(HttpStatusCode.OK, mapOf("token" to token))
             } else {

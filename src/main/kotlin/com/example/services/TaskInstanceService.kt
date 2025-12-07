@@ -32,6 +32,12 @@ class TaskInstanceService {
             .map { rowToTaskInstance(it) }
     }
 
+    fun exists(moduleInstanceId: Int, taskId: Int): Boolean = transaction {
+        TaskInstanceTable.selectAll()
+            .where { (TaskInstanceTable.moduleInstanceId eq moduleInstanceId) and (TaskInstanceTable.taskId eq taskId) }
+            .count() > 0
+    }
+
     fun markAsCompleted(id: Int, duration: String?): Int = transaction {
         logger.info("Marking task instance $id as completed")
         TaskInstanceTable.update({ TaskInstanceTable.id eq id }) {

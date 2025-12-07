@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.models.tables.EvaluatorTable
 import io.github.cdimascio.dotenv.dotenv
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.util.*
@@ -16,22 +16,34 @@ class AuthService {
     private val jwtIssuer = dotenv["JWT_ISSUER"] ?: "http://0.0.0.0:8080/"
     private val jwtAudience = dotenv["JWT_AUDIENCE"] ?: "http://0.0.0.0:8080/hello"
 
-    fun login(username: String, password: String):String? {
+    fun login(usernameOrEmail: String, password: String):String? {
         val user = transaction {
-            EvaluatorTable.select(EvaluatorTable.username eq username)
+            EvaluatorTable.selectAll().where { (EvaluatorTable.username eq usernameOrEmail) or (EvaluatorTable.email eq usernameOrEmail) }
                 .singleOrNull()
-        } ?: return null
+        }
 
-        val hashedPassword = user[EvaluatorTable.password]
-        
-        if (!BCrypt.checkpw(password, hashedPassword)) {
+        if (user == null) {
             return null
         }
+
+        val storedUsername = user[EvaluatorTable.username]
+        val storedEmail = user[EvaluatorTable.email]
+        val hashedPassword = user[EvaluatorTable.password]
+        
+        println("✅ User found: $storedUsername ($storedEmail)")
+        // println("🔑 Stored Hash: $hashedPassword") // Optional: print hash for verification
+        
+        if (!BCrypt.checkpw(password, hashedPassword)) {
+            println("❌ Password check FAILED for: $storedUsername")
+            return null
+        }
+
+        println("✅ Password check PASSED for: $storedUsername")
 
         return JWT.create()
             .withAudience(jwtAudience)
             .withIssuer(jwtIssuer)
-            .withClaim("username", username)
+            .withClaim("username", user[EvaluatorTable.username])
             .withClaim("id", user[EvaluatorTable.id])
             .withClaim("isAdmin", user[EvaluatorTable.isAdmin])
             .withExpiresAt(Date(System.currentTimeMillis() + 60000 * 60 * 2)) // 2 hours

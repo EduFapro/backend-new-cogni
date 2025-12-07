@@ -31,6 +31,12 @@ class ModuleInstanceService {
             .map { rowToModuleInstance(it) }
     }
 
+    fun exists(evaluationId: Int, moduleId: Int): Boolean = transaction {
+        ModuleInstanceTable.selectAll()
+            .where { (ModuleInstanceTable.evaluationId eq evaluationId) and (ModuleInstanceTable.moduleId eq moduleId) }
+            .count() > 0
+    }
+
     fun updateStatus(id: Int, newStatus: Int): Int = transaction {
         logger.info("Updating module instance $id status to $newStatus")
         ModuleInstanceTable.update({ ModuleInstanceTable.id eq id }) {

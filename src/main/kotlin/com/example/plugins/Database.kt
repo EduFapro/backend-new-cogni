@@ -4,10 +4,7 @@ import com.example.models.tables.*
 import com.example.services.AuthService
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
@@ -38,10 +35,15 @@ fun Application.configureDatabase() {
             RecordingFileTable
         )
 
-        // Seeding
-        if (EvaluatorTable.selectAll().count() == 0L) {
-            val logger = LoggerFactory.getLogger("DatabaseSeeding")
-            logger.info("🌱 Seeding default admin user...")
+        // DEBUG: List all users
+        val allUsers = EvaluatorTable.selectAll().map { 
+            "${it[EvaluatorTable.username]} (${it[EvaluatorTable.email]})" 
+        }
+        println("📊 Current Users in DB: $allUsers")
+
+        // Seeding Admin
+        if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "admin" }) {
+            println("🌱 Seeding default admin user...")
             
             val authService = AuthService()
             val hashedPassword = authService.hashPassword("admin")
@@ -58,7 +60,45 @@ fun Application.configureDatabase() {
                 it[isAdmin] = true
                 it[firstLogin] = false
             }
-            logger.info("✅ Default admin user created: admin / admin")
+            println("✅ Default admin user created: admin / admin")
+        }
+
+        // Seeding Demo User
+        val authService = AuthService()
+        val demoPassword = authService.hashPassword("0000")
+        
+        if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "demo" }) {
+            println("🌱 Seeding demo user...")
+
+            try {
+                EvaluatorTable.insert {
+                    it[name] = "Demo"
+                    it[surname] = "User"
+                    it[email] = "demo@example.com"
+                    it[birthDate] = "1998-07-14"
+                    it[specialty] = "Psicologia"
+                    it[cpfOrNif] = "03240120010"
+                    it[username] = "demo"
+                    it[password] = demoPassword
+                    it[isAdmin] = false
+                    it[firstLogin] = true
+                }
+                println("✅ Demo user created: demo@example.com / 0000")
+            } catch (e: Exception) {
+                println("❌ Failed to seed demo user: ${e.message}")
+                e.printStackTrace()
+            }
+        } else {
+             // Force update password to ensure it matches "0000"
+             try {
+                 EvaluatorTable.update({ EvaluatorTable.username eq "demo" }) {
+                    it[password] = demoPassword
+                 }
+                 println("🔄 Demo user password reset to: 0000")
+             } catch (e: Exception) {
+                 println("❌ Failed to update demo user password: ${e.message}")
+                 e.printStackTrace()
+             }
         }
     }
 }

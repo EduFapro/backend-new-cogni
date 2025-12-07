@@ -1,19 +1,29 @@
 package com.example.services
 
+import com.example.models.Evaluation
+import com.example.models.ModuleInstance
+import com.example.models.TaskInstance
 import com.example.models.Participant
 import com.example.models.tables.ParticipantTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
-class ParticipantService {
+class ParticipantService(
+    private val evaluationService: EvaluationService,
+    private val moduleInstanceService: ModuleInstanceService,
+    private val taskInstanceService: TaskInstanceService,
+    private val templateService: TemplateService
+) {
     private val logger = LoggerFactory.getLogger(ParticipantService::class.java)
 
     fun create(participant: Participant): Int = transaction {
         logger.info("Creating participant: ${participant.name} ${participant.surname}")
         
-        ParticipantTable.insert {
+        // 1. Create Participant
+        val participantId = ParticipantTable.insert {
             it[name] = participant.name
             it[surname] = participant.surname
             it[birthDate] = participant.birthDate
@@ -22,6 +32,49 @@ class ParticipantService {
             it[laterality] = participant.laterality
             it[evaluatorId] = participant.evaluatorId
         }[ParticipantTable.id]
+
+        // 2. Create Evaluation (Status 1 = Pending)
+        val evaluation = Evaluation(
+            id = 0,
+            evaluatorId = participant.evaluatorId,
+            participantId = participantId,
+            evaluationDate = LocalDateTime.now().toString(),
+            status = 1,
+            language = 1 // Default to Portuguese
+        )
+        val evaluationId = evaluationService.create(evaluation)
+        logger.info("Created evaluation $evaluationId for participant $participantId")
+
+        // 3. Create Module Instances & Task Instances
+        val modules = templateService.getAllModules()
+        for (module in modules) {
+            if (!moduleInstanceService.exists(evaluationId, module.id)) {
+                val moduleInstance = ModuleInstance(
+                    id = 0,
+                    moduleId = module.id,
+                    evaluationId = evaluationId,
+                    status = 1 // Pending
+                )
+                val moduleInstanceId = moduleInstanceService.create(moduleInstance)
+                
+                // Create Tasks for this Module
+                val tasks = templateService.getTasksByModuleId(module.id)
+                for (task in tasks) {
+                    if (!taskInstanceService.exists(moduleInstanceId, task.id)) {
+                        val taskInstance = TaskInstance(
+                            id = 0,
+                            taskId = task.id,
+                            moduleInstanceId = moduleInstanceId,
+                            status = 1, // Pending
+                            completingTime = null
+                        )
+                        taskInstanceService.create(taskInstance)
+                    }
+                }
+            }
+        }
+
+        participantId
     }
 
     fun getById(id: Int): Participant? = transaction {
