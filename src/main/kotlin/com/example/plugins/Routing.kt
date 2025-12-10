@@ -86,5 +86,6 @@ fun Application.configureRouting() {
         moduleInstanceRoutes(ModuleInstanceService())
         taskInstanceRoutes(TaskInstanceService())
         recordingFileRoutes(RecordingFileService())
+        authRoutes()
     }
 }

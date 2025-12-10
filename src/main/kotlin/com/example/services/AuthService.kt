@@ -47,4 +47,76 @@ class AuthService {
     fun hashPassword(password: String): String {
         return BCrypt.hashpw(password, BCrypt.gensalt())
     }
+
+    fun changePassword(userId: Int, oldPassword: String, newPassword: String): Boolean {
+        val user = transaction {
+            EvaluatorTable.select { EvaluatorTable.id eq userId }.singleOrNull()
+        } ?: return false
+
+        val currentHashedPassword = user[EvaluatorTable.password]
+        if (!BCrypt.checkpw(oldPassword, currentHashedPassword)) {
+            return false
+        }
+
+        val newHashed = hashPassword(newPassword)
+        transaction {
+            EvaluatorTable.update({ EvaluatorTable.id eq userId }) {
+                it[password] = newHashed
+            }
+        }
+        return true
+    }
+
+    fun requestPasswordReset(email: String): String? {
+        val user = transaction {
+            EvaluatorTable.select { EvaluatorTable.email eq email }.singleOrNull()
+        } ?: return null
+
+        val userId = user[EvaluatorTable.id]
+        val token = UUID.randomUUID().toString()
+
+        transaction {
+            // Invalidate old tokens for this user
+            com.example.models.tables.PasswordResetTokenTable.deleteWhere {
+                com.example.models.tables.PasswordResetTokenTable.userId eq userId
+            }
+
+            com.example.models.tables.PasswordResetTokenTable.insert {
+                it[com.example.models.tables.PasswordResetTokenTable.token] = token
+                it[com.example.models.tables.PasswordResetTokenTable.userId] = userId
+                it[expiresAt] = java.time.LocalDateTime.now().plusMinutes(15)
+            }
+        }
+        
+        // In a real app, send email here. For now, return token for logging/testing.
+        println("RESET TOKEN FOR $email: $token")
+        return token
+    }
+
+    fun resetPassword(token: String, newPassword: String): Boolean {
+        val tokenRow = transaction {
+            com.example.models.tables.PasswordResetTokenTable.select {
+                com.example.models.tables.PasswordResetTokenTable.token eq token
+            }.singleOrNull()
+        } ?: return false
+
+        val expiresAt = tokenRow[com.example.models.tables.PasswordResetTokenTable.expiresAt]
+        if (expiresAt.isBefore(java.time.LocalDateTime.now())) {
+            return false
+        }
+
+        val userId = tokenRow[com.example.models.tables.PasswordResetTokenTable.userId]
+        val newHashed = hashPassword(newPassword)
+
+        transaction {
+            EvaluatorTable.update({ EvaluatorTable.id eq userId }) {
+                it[password] = newHashed
+            }
+            // Invalidate token
+            com.example.models.tables.PasswordResetTokenTable.deleteWhere {
+                com.example.models.tables.PasswordResetTokenTable.token eq token
+            }
+        }
+        return true
+    }
 }

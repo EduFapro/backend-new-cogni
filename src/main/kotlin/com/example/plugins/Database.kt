@@ -32,7 +32,8 @@ fun Application.configureDatabase() {
             EvaluationTable,
             ModuleInstanceTable,
             TaskInstanceTable,
-            RecordingFileTable
+            RecordingFileTable,
+            PasswordResetTokenTable
         )
 
         val logger = LoggerFactory.getLogger("DatabaseSeeding")
