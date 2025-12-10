@@ -35,40 +35,36 @@ fun Application.configureDatabase() {
             RecordingFileTable
         )
 
-        // DEBUG: List all users
-        val allUsers = EvaluatorTable.selectAll().map { 
-            "${it[EvaluatorTable.username]} (${it[EvaluatorTable.email]})" 
-        }
-        println("📊 Current Users in DB: $allUsers")
+        val logger = LoggerFactory.getLogger("DatabaseSeeding")
 
-        // Seeding Admin
-        if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "admin" }) {
-            println("🌱 Seeding default admin user...")
-            
-            val authService = AuthService()
-            val hashedPassword = authService.hashPassword("admin")
-
-            EvaluatorTable.insert {
-                it[name] = "Admin"
-                it[surname] = "User"
-                it[email] = "admin@cogni.com"
-                it[birthDate] = "2000-01-01"
-                it[specialty] = "Administration"
-                it[cpfOrNif] = "00000000000"
-                it[username] = "admin"
-                it[password] = hashedPassword
-                it[isAdmin] = true
-                it[firstLogin] = false
-            }
-            println("✅ Default admin user created: admin / admin")
-        }
+//      // Seeding Admin
+//      if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "admin" }) {
+//          logger.info("🌱 Seeding default admin user...")
+//          
+//          val authService = AuthService()
+//          val hashedPassword = authService.hashPassword("admin")
+//
+//          EvaluatorTable.insert {
+//              it[name] = "Admin"
+//              it[surname] = "User"
+//              it[email] = "admin@cogni.com"
+//              it[birthDate] = "2000-01-01"
+//              it[specialty] = "Administration"
+//              it[cpfOrNif] = "00000000000"
+//              it[username] = "admin"
+//              it[password] = hashedPassword
+//              it[isAdmin] = true
+//              it[firstLogin] = false
+//          }
+//          logger.info("✅ Default admin user created: admin / admin")
+//      }
 
         // Seeding Demo User
         val authService = AuthService()
         val demoPassword = authService.hashPassword("0000")
         
         if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "demo" }) {
-            println("🌱 Seeding demo user...")
+            logger.info("🌱 Seeding demo user...")
 
             try {
                 EvaluatorTable.insert {
@@ -83,10 +79,9 @@ fun Application.configureDatabase() {
                     it[isAdmin] = false
                     it[firstLogin] = true
                 }
-                println("✅ Demo user created: demo@example.com / 0000")
+                logger.info("✅ Demo user created: demo@example.com / 0000")
             } catch (e: Exception) {
-                println("❌ Failed to seed demo user: ${e.message}")
-                e.printStackTrace()
+                logger.error("❌ Failed to seed demo user: ${e.message}")
             }
         } else {
              // Force update password to ensure it matches "0000"
@@ -94,10 +89,9 @@ fun Application.configureDatabase() {
                  EvaluatorTable.update({ EvaluatorTable.username eq "demo" }) {
                     it[password] = demoPassword
                  }
-                 println("🔄 Demo user password reset to: 0000")
+                 logger.info("🔄 Demo user password reset to: 0000")
              } catch (e: Exception) {
-                 println("❌ Failed to update demo user password: ${e.message}")
-                 e.printStackTrace()
+                 logger.error("❌ Failed to update demo user password: ${e.message}")
              }
         }
     }

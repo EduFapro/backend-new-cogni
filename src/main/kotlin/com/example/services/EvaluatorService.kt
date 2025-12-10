@@ -13,6 +13,9 @@ class EvaluatorService {
     fun create(evaluator: Evaluator): Int = transaction {
         logger.info("Creating evaluator: ${evaluator.username}")
         
+        val authService = AuthService()
+        val hashedPassword = authService.hashPassword(evaluator.password)
+
         EvaluatorTable.insert {
             it[name] = evaluator.name
             it[surname] = evaluator.surname
@@ -21,7 +24,7 @@ class EvaluatorService {
             it[specialty] = evaluator.specialty
             it[cpfOrNif] = evaluator.cpfOrNif
             it[username] = evaluator.username
-            it[password] = evaluator.password
+            it[password] = hashedPassword
             it[firstLogin] = evaluator.firstLogin
             it[isAdmin] = evaluator.isAdmin
         }[EvaluatorTable.id]
@@ -36,6 +39,9 @@ class EvaluatorService {
     fun update(id: Int, evaluator: Evaluator): Int = transaction {
         logger.info("Updating evaluator ID: $id")
         
+        val authService = AuthService()
+        val hashedPassword = authService.hashPassword(evaluator.password)
+
         EvaluatorTable.update({ EvaluatorTable.id eq id }) {
             it[name] = evaluator.name
             it[surname] = evaluator.surname
@@ -44,7 +50,7 @@ class EvaluatorService {
             it[specialty] = evaluator.specialty
             it[cpfOrNif] = evaluator.cpfOrNif
             it[username] = evaluator.username
-            it[password] = evaluator.password
+            it[password] = hashedPassword
             it[firstLogin] = evaluator.firstLogin
             it[isAdmin] = evaluator.isAdmin
         }

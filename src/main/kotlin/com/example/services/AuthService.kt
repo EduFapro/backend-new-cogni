@@ -30,15 +30,9 @@ class AuthService {
         val storedEmail = user[EvaluatorTable.email]
         val hashedPassword = user[EvaluatorTable.password]
         
-        println("✅ User found: $storedUsername ($storedEmail)")
-        // println("🔑 Stored Hash: $hashedPassword") // Optional: print hash for verification
-        
         if (!BCrypt.checkpw(password, hashedPassword)) {
-            println("❌ Password check FAILED for: $storedUsername")
             return null
         }
-
-        println("✅ Password check PASSED for: $storedUsername")
 
         return JWT.create()
             .withAudience(jwtAudience)

@@ -45,7 +45,7 @@ class TaskInstanceRoutesTest {
             moduleInstanceId = 1,
             taskId = 1,
             status = 1,
-            completingTime = null
+            executionDuration = null
         )
 
         every { service.create(any()) } returns 1
@@ -85,7 +85,7 @@ class TaskInstanceRoutesTest {
             moduleInstanceId = 1,
             taskId = 1,
             status = 1,
-            completingTime = null
+            executionDuration = null
         )
 
         every { service.getById(1) } returns taskInstance
@@ -123,7 +123,7 @@ class TaskInstanceRoutesTest {
             moduleInstanceId = 1,
             taskId = 1,
             status = 1,
-            completingTime = null
+            executionDuration = null
         )
 
         every { service.getByModuleInstanceId(1) } returns listOf(taskInstance)

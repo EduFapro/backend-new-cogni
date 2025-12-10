@@ -7,9 +7,32 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import com.example.plugins.protectedRoute
 import org.slf4j.LoggerFactory
+
+@Serializable
+data class ParticipantCreateDTO(
+    val name: String,
+    val surname: String,
+    val birthDate: String,
+    val sex: Int,
+    val educationLevel: Int,
+    val laterality: Int,
+    val evaluatorId: Int,
+    val selectedModuleIds: List<Int> = emptyList()
+)
+
+fun ParticipantCreateDTO.toParticipant() = Participant(
+    name = name,
+    surname = surname,
+    birthDate = birthDate,
+    sex = sex,
+    educationLevel = educationLevel,
+    laterality = laterality,
+    evaluatorId = evaluatorId
+)
 
 fun Route.participantRoutes(service: ParticipantService) {
     val logger = LoggerFactory.getLogger("ParticipantRoutes")
@@ -18,8 +41,9 @@ fun Route.participantRoutes(service: ParticipantService) {
         route("/api/participants") {
             post {
                 try {
-                    val participant = call.receive<Participant>()
+                    val request = call.receive<ParticipantCreateDTO>()
                     
+                    val participant = request.toParticipant()
                     val missingFields = participant.validateRequiredFields()
                     if (missingFields.isNotEmpty()) {
                         call.respond(
@@ -29,7 +53,7 @@ fun Route.participantRoutes(service: ParticipantService) {
                         return@post
                     }
 
-                    val id = service.create(participant)
+                    val id = service.create(participant, request.selectedModuleIds)
                     call.respond(HttpStatusCode.Created, buildJsonObject {
                         put("id", id)
                         put("message", "Participant created successfully")

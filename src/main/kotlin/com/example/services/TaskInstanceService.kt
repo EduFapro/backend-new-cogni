@@ -17,7 +17,7 @@ class TaskInstanceService {
             it[taskId] = taskInstance.taskId
             it[moduleInstanceId] = taskInstance.moduleInstanceId
             it[status] = taskInstance.status
-            it[completingTime] = taskInstance.completingTime
+            it[executionDuration] = taskInstance.executionDuration
         }[TaskInstanceTable.id]
     }
 
@@ -43,7 +43,7 @@ class TaskInstanceService {
         TaskInstanceTable.update({ TaskInstanceTable.id eq id }) {
             it[status] = 3 // Completed
             if (duration != null) {
-                it[completingTime] = duration
+                it[executionDuration] = duration
             }
         }
     }
@@ -58,6 +58,6 @@ class TaskInstanceService {
         taskId = row[TaskInstanceTable.taskId],
         moduleInstanceId = row[TaskInstanceTable.moduleInstanceId],
         status = row[TaskInstanceTable.status],
-        completingTime = row[TaskInstanceTable.completingTime]
+        executionDuration = row[TaskInstanceTable.executionDuration]
     )
 }

@@ -19,8 +19,8 @@ class ParticipantService(
 ) {
     private val logger = LoggerFactory.getLogger(ParticipantService::class.java)
 
-    fun create(participant: Participant): Int = transaction {
-        logger.info("Creating participant: ${participant.name} ${participant.surname}")
+    fun create(participant: Participant, selectedModuleIds: List<Int>): Int = transaction {
+        logger.info("Creating participant: ${participant.name} ${participant.surname} with modules: $selectedModuleIds")
         
         // 1. Create Participant
         val participantId = ParticipantTable.insert {
@@ -46,8 +46,14 @@ class ParticipantService(
         logger.info("Created evaluation $evaluationId for participant $participantId")
 
         // 3. Create Module Instances & Task Instances
-        val modules = templateService.getAllModules()
-        for (module in modules) {
+        val allModules = templateService.getAllModules()
+        val modulesToCreate = if (selectedModuleIds.isNotEmpty()) {
+            allModules.filter { it.id in selectedModuleIds }
+        } else {
+            allModules // Fallback: create all if none selected (or empty list if that's preferred, but keeping legacy behavior for safety)
+        }
+
+        for (module in modulesToCreate) {
             if (!moduleInstanceService.exists(evaluationId, module.id)) {
                 val moduleInstance = ModuleInstance(
                     id = 0,
@@ -66,7 +72,7 @@ class ParticipantService(
                             taskId = task.id,
                             moduleInstanceId = moduleInstanceId,
                             status = 1, // Pending
-                            completingTime = null
+                            executionDuration = null
                         )
                         taskInstanceService.create(taskInstance)
                     }

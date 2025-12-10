@@ -8,7 +8,7 @@ data class TaskInstance(
     val taskId: Int,
     val moduleInstanceId: Int,
     val status: Int = 1, // 1=Pending, 2=InProgress, 3=Completed
-    val completingTime: String? = null
+    val executionDuration: String? = null
 )
 
 fun TaskInstance.validateRequiredFields(): List<String> {

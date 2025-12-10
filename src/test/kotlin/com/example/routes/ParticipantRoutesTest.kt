@@ -29,8 +29,7 @@ class ParticipantRoutesTest {
             }
         }
 
-        val participant = Participant(
-            id = 1,
+        val participantDto = ParticipantCreateDTO(
             name = "Jane",
             surname = "Doe",
             birthDate = "2010-01-01",
@@ -40,16 +39,22 @@ class ParticipantRoutesTest {
             evaluatorId = 1
         )
 
-        every { service.create(any()) } returns 1
+        every { service.create(
+            any(),
+            selectedModuleIds = any()
+        ) } returns 1
 
         val response = client.post("/api/participants") {
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(Participant.serializer(), participant))
+            setBody(Json.encodeToString(ParticipantCreateDTO.serializer(), participantDto))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
         assertTrue(response.bodyAsText().contains("Participant created successfully"))
-        verify { service.create(any()) }
+        verify { service.create(
+            any(),
+            selectedModuleIds = any()
+        ) }
     }
 
     @Test
