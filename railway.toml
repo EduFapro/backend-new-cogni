@@ -1,0 +1,54 @@
+# railway.toml
+# Define infrastructure and environments using Railway Config-as-Code
+# Docs: https://docs.railway.app/reference/project-config
+
+[project]
+name = "new-cogni"
+
+[environments.production]
+domain = "backend-new-cogni-production.up.railway.app"
+
+# ==========================================
+# Backend Service
+# ==========================================
+
+[services.backend]
+name = "backend-new-cogni"
+source = "."
+dockerfile = "Dockerfile"
+rootDirectory = "."
+
+[services.backend.env]
+# Application Mode
+APP_MODE = "prod"
+# DEV_MODE is unused in code logic but requested explicitly
+DEV_MODE = "false"
+
+# Database Configuration
+# References the 'Postgres' plugin variables defined below
+DB_URL      = "jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}"
+DB_USER     = "${{Postgres.PGUSER}}"
+DB_PASSWORD = "${{Postgres.PGPASSWORD}}"
+
+# JWT Configuration
+JWT_SECRET   = "783MHD84S"
+JWT_ISSUER   = "https://backend-new-cogni-production.up.railway.app/"
+JWT_AUDIENCE = "https://backend-new-cogni-production.up.railway.app/hello"
+JWT_REALM    = "Access to 'hello'"
+
+# ==========================================
+# PostgreSQL Plugin
+# ==========================================
+
+[plugins.postgres]
+# Renamed to match the variable references in backend env (Postgres.PGHOST etc)
+name = "Postgres"
+type = "postgres"
+version = "16"
+
+[plugins.postgres.env]
+# Hardcoded values provided by user
+POSTGRES_DB       = "railway"
+POSTGRES_USER     = "postgres"
+POSTGRES_PASSWORD = "ilQIVdjvXUrfPcJtSBtEDfAMFGRRGmij"
+PGDATA            = "/var/lib/postgresql/data/pgdata"

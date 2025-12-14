@@ -9,6 +9,8 @@ data class Evaluation(
     val participantId: Int,
     val evaluationDate: String, // ISO datetime format
     val status: Int = 1, // 1=Pending, 2=InProgress, 3=Completed
+    val creationDate: String? = null,
+    val completionDate: String? = null,
     val language: Int
 )
 

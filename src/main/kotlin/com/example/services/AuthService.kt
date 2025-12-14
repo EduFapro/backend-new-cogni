@@ -50,7 +50,7 @@ class AuthService {
 
     fun changePassword(userId: Int, oldPassword: String, newPassword: String): Boolean {
         val user = transaction {
-            EvaluatorTable.select { EvaluatorTable.id eq userId }.singleOrNull()
+            EvaluatorTable.selectAll().where { EvaluatorTable.id eq userId }.singleOrNull()
         } ?: return false
 
         val currentHashedPassword = user[EvaluatorTable.password]
@@ -69,7 +69,7 @@ class AuthService {
 
     fun requestPasswordReset(email: String): String? {
         val user = transaction {
-            EvaluatorTable.select { EvaluatorTable.email eq email }.singleOrNull()
+            EvaluatorTable.selectAll().where { EvaluatorTable.email eq email }.singleOrNull()
         } ?: return null
 
         val userId = user[EvaluatorTable.id]
@@ -84,7 +84,7 @@ class AuthService {
             com.example.models.tables.PasswordResetTokenTable.insert {
                 it[com.example.models.tables.PasswordResetTokenTable.token] = token
                 it[com.example.models.tables.PasswordResetTokenTable.userId] = userId
-                it[expiresAt] = java.time.LocalDateTime.now().plusMinutes(15)
+                it[expiresAt] = java.time.LocalDateTime.now().plusMinutes(15).toString()
             }
         }
         
@@ -95,12 +95,13 @@ class AuthService {
 
     fun resetPassword(token: String, newPassword: String): Boolean {
         val tokenRow = transaction {
-            com.example.models.tables.PasswordResetTokenTable.select {
+            com.example.models.tables.PasswordResetTokenTable.selectAll().where {
                 com.example.models.tables.PasswordResetTokenTable.token eq token
             }.singleOrNull()
         } ?: return false
 
-        val expiresAt = tokenRow[com.example.models.tables.PasswordResetTokenTable.expiresAt]
+        val expiresAtStr = tokenRow[com.example.models.tables.PasswordResetTokenTable.expiresAt]
+        val expiresAt = java.time.LocalDateTime.parse(expiresAtStr)
         if (expiresAt.isBefore(java.time.LocalDateTime.now())) {
             return false
         }

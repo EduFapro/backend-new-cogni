@@ -14,5 +14,6 @@ data class Evaluator(
     val username: String,
     val password: String,
     val firstLogin: Boolean = true,
-    val isAdmin: Boolean = false
+    val isAdmin: Boolean = false,
+    val creationDate: String? = null
 )

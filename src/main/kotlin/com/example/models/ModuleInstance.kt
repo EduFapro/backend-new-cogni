@@ -7,7 +7,8 @@ data class ModuleInstance(
     val id: Int? = null,
     val moduleId: Int,
     val evaluationId: Int,
-    val status: Int = 1 // 1=Pending, 2=InProgress, 3=Completed
+    val status: Int = 1, // 1=Pending, 2=InProgress, 3=Completed
+    val completionDate: String? = null
 )
 
 fun ModuleInstance.validateRequiredFields(): List<String> {

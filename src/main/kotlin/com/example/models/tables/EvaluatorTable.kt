@@ -14,6 +14,7 @@ object EvaluatorTable : Table("evaluators") {
     val password = varchar("password", 255) // hashed
     val firstLogin = bool("first_login").default(true)
     val isAdmin = bool("is_admin").default(false)
+    val creationDate = varchar("creation_date", 25).default("") // ISO 8601
 
     override val primaryKey = PrimaryKey(id)
 }

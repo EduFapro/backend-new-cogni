@@ -11,7 +11,8 @@ data class Participant(
     val sex: Int, // 1=Male, 2=Female, 3=Other
     val educationLevel: Int,
     val laterality: Int, // 1=Right, 2=Left, 3=Both
-    val evaluatorId: Int
+    val evaluatorId: Int,
+    val creationDate: String? = null
 )
 
 fun Participant.validateRequiredFields(): List<String> {

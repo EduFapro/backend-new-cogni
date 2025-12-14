@@ -41,6 +41,9 @@ class ModuleInstanceService {
         logger.info("Updating module instance $id status to $newStatus")
         ModuleInstanceTable.update({ ModuleInstanceTable.id eq id }) {
             it[status] = newStatus
+            if (newStatus == 3) {
+                it[completionDate] = java.time.LocalDateTime.now().toString()
+            }
         }
     }
 
@@ -53,6 +56,7 @@ class ModuleInstanceService {
         id = row[ModuleInstanceTable.id],
         moduleId = row[ModuleInstanceTable.moduleId],
         evaluationId = row[ModuleInstanceTable.evaluationId],
-        status = row[ModuleInstanceTable.status]
+        status = row[ModuleInstanceTable.status],
+        completionDate = row[ModuleInstanceTable.completionDate]
     )
 }

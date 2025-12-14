@@ -11,6 +11,7 @@ object ParticipantTable : Table("participants") {
     val educationLevel = integer("education_level")
     val laterality = integer("laterality") // 1=Right, 2=Left, 3=Both
     val evaluatorId = integer("evaluator_id").references(EvaluatorTable.id)
+    val creationDate = varchar("creation_date", 25).default("") // ISO 8601
 
     override val primaryKey = PrimaryKey(id)
 }

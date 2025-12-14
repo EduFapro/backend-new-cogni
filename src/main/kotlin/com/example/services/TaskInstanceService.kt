@@ -42,6 +42,7 @@ class TaskInstanceService {
         logger.info("Marking task instance $id as completed")
         TaskInstanceTable.update({ TaskInstanceTable.id eq id }) {
             it[status] = 3 // Completed
+            it[completionDate] = java.time.LocalDateTime.now().toString()
             if (duration != null) {
                 it[executionDuration] = duration
             }
@@ -58,6 +59,8 @@ class TaskInstanceService {
         taskId = row[TaskInstanceTable.taskId],
         moduleInstanceId = row[TaskInstanceTable.moduleInstanceId],
         status = row[TaskInstanceTable.status],
-        executionDuration = row[TaskInstanceTable.executionDuration]
+        executionDuration = row[TaskInstanceTable.executionDuration],
+        videoPath = row[TaskInstanceTable.videoPath],
+        completionDate = row[TaskInstanceTable.completionDate]
     )
 }

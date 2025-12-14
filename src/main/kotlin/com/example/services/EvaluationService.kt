@@ -18,6 +18,7 @@ class EvaluationService {
             it[evaluationDate] = evaluation.evaluationDate
             it[status] = evaluation.status
             it[language] = evaluation.language
+            it[creationDate] = java.time.LocalDateTime.now().toString()
         }[EvaluationTable.id]
     }
 
@@ -43,6 +44,9 @@ class EvaluationService {
         logger.info("Updating evaluation $id status to $newStatus")
         EvaluationTable.update({ EvaluationTable.id eq id }) {
             it[status] = newStatus
+            if (newStatus == 3) {
+                it[completionDate] = java.time.LocalDateTime.now().toString()
+            }
         }
     }
 
@@ -52,7 +56,9 @@ class EvaluationService {
         participantId = row[EvaluationTable.participantId],
         evaluationDate = row[EvaluationTable.evaluationDate],
         status = row[EvaluationTable.status],
-        language = row[EvaluationTable.language]
+        language = row[EvaluationTable.language],
+        creationDate = row[EvaluationTable.creationDate],
+        completionDate = row[EvaluationTable.completionDate]
     )
 }
 

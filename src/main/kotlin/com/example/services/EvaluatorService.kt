@@ -27,6 +27,7 @@ class EvaluatorService {
             it[password] = hashedPassword
             it[firstLogin] = evaluator.firstLogin
             it[isAdmin] = evaluator.isAdmin
+            it[creationDate] = java.time.LocalDateTime.now().toString()
         }[EvaluatorTable.id]
     }
 
@@ -72,6 +73,7 @@ class EvaluatorService {
         username = row[EvaluatorTable.username],
         password = row[EvaluatorTable.password],
         firstLogin = row[EvaluatorTable.firstLogin],
-        isAdmin = row[EvaluatorTable.isAdmin]
+        isAdmin = row[EvaluatorTable.isAdmin],
+        creationDate = row[EvaluatorTable.creationDate]
     )
 }

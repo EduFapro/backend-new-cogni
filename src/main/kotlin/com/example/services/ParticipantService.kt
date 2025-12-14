@@ -31,6 +31,7 @@ class ParticipantService(
             it[educationLevel] = participant.educationLevel
             it[laterality] = participant.laterality
             it[evaluatorId] = participant.evaluatorId
+            it[creationDate] = java.time.LocalDateTime.now().toString()
         }[ParticipantTable.id]
 
         // 2. Create Evaluation (Status 1 = Pending)
@@ -121,6 +122,7 @@ class ParticipantService(
         sex = row[ParticipantTable.sex],
         educationLevel = row[ParticipantTable.educationLevel],
         laterality = row[ParticipantTable.laterality],
-        evaluatorId = row[ParticipantTable.evaluatorId]
+        evaluatorId = row[ParticipantTable.evaluatorId],
+        creationDate = row[ParticipantTable.creationDate]
     )
 }
