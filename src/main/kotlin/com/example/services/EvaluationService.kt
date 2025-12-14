@@ -18,9 +18,10 @@ class EvaluationService {
             it[evaluationDate] = evaluation.evaluationDate
             it[status] = evaluation.status
             it[language] = evaluation.language
-            it[creationDate] = java.time.LocalDateTime.now().toString()
+            it[creationDate] = java.time.LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString()
         }[EvaluationTable.id]
     }
+
 
     fun getById(id: Int): Evaluation? = transaction {
         EvaluationTable.selectAll().where { EvaluationTable.id eq id }
@@ -45,7 +46,7 @@ class EvaluationService {
         EvaluationTable.update({ EvaluationTable.id eq id }) {
             it[status] = newStatus
             if (newStatus == 3) {
-                it[completionDate] = java.time.LocalDateTime.now().toString()
+                it[completionDate] = java.time.LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString()
             }
         }
     }

@@ -42,7 +42,7 @@ class TaskInstanceService {
         logger.info("Marking task instance $id as completed")
         TaskInstanceTable.update({ TaskInstanceTable.id eq id }) {
             it[status] = 3 // Completed
-            it[completionDate] = java.time.LocalDateTime.now().toString()
+            it[completionDate] = java.time.LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString()
             if (duration != null) {
                 it[executionDuration] = duration
             }

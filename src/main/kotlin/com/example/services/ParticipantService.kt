@@ -31,7 +31,7 @@ class ParticipantService(
             it[educationLevel] = participant.educationLevel
             it[laterality] = participant.laterality
             it[evaluatorId] = participant.evaluatorId
-            it[creationDate] = java.time.LocalDateTime.now().toString()
+            it[creationDate] = java.time.LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString()
         }[ParticipantTable.id]
 
         // 2. Create Evaluation (Status 1 = Pending)
@@ -39,7 +39,7 @@ class ParticipantService(
             id = 0,
             evaluatorId = participant.evaluatorId,
             participantId = participantId,
-            evaluationDate = LocalDateTime.now().toString(),
+            evaluationDate = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString(),
             status = 1,
             language = 1 // Default to Portuguese
         )
