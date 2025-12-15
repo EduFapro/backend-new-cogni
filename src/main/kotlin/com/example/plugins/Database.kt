@@ -13,9 +13,18 @@ fun Application.configureDatabase() {
         ignoreIfMissing = true
     }
 
-    val dbUrl = dotenv["DB_URL"] ?: error("DB_URL is missing in .env")
-    val dbUser = dotenv["DB_USER"] ?: error("DB_USER is missing in .env")
-    val dbPass = dotenv["DB_PASSWORD"] ?: error("DB_PASSWORD is missing in .env")
+    val dbUrl = System.getenv("DB_URL") ?: dotenv["DB_URL"] ?: error("DB_URL is missing in .env")
+    val dbUser = System.getenv("DB_USER") ?: dotenv["DB_USER"] ?: error("DB_USER is missing in .env")
+    val dbPass = System.getenv("DB_PASSWORD") ?: dotenv["DB_PASSWORD"] ?: error("DB_PASSWORD is missing in .env")
+
+    val logger = LoggerFactory.getLogger("DatabaseConfig")
+    try {
+        // Naive parse to log host for verification (jdbc:postgresql://HOST:PORT/DB)
+        val host = dbUrl.substringAfter("://").substringBefore(":")
+        logger.info("🔌 Database Host: $host (Check if internal/private)")
+    } catch (e: Exception) {
+        logger.warn("Could not parse DB Host from URL")
+    }
 
     Database.connect(
         url = dbUrl,
@@ -38,27 +47,6 @@ fun Application.configureDatabase() {
 
         val logger = LoggerFactory.getLogger("DatabaseSeeding")
 
-//      // Seeding Admin
-//      if (EvaluatorTable.selectAll().none { it[EvaluatorTable.username] == "admin" }) {
-//          logger.info("🌱 Seeding default admin user...")
-//          
-//          val authService = AuthService()
-//          val hashedPassword = authService.hashPassword("admin")
-//
-//          EvaluatorTable.insert {
-//              it[name] = "Admin"
-//              it[surname] = "User"
-//              it[email] = "admin@cogni.com"
-//              it[birthDate] = "2000-01-01"
-//              it[specialty] = "Administration"
-//              it[cpfOrNif] = "00000000000"
-//              it[username] = "admin"
-//              it[password] = hashedPassword
-//              it[isAdmin] = true
-//              it[firstLogin] = false
-//          }
-//          logger.info("✅ Default admin user created: admin / admin")
-//      }
 
         // Seeding Demo User
         val authService = AuthService()
