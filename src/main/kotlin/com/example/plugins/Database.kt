@@ -13,37 +13,67 @@ fun Application.configureDatabase() {
         ignoreIfMissing = true
     }
 
-    // 1. Prefer DATABASE_URL from Railway (canonical internal), prefixing with jdbc: if needed
-    // 2. Fallback to DB_URL from env or .env
+    // 1. Prefer DATABASE_URL from Railway (canonical internal)
+    // We must manually parse it because adding "jdbc:" to "postgresql://user:pass@host"
+    // often causes UnknownHostException with some JDBC drivers which don't expect auth in the Authority info.
     val rawUrl = System.getenv("DATABASE_URL")
-    val dbUrl = when {
-        rawUrl != null && !rawUrl.startsWith("jdbc:") -> "jdbc:$rawUrl"
-        rawUrl != null -> rawUrl
-        else -> System.getenv("DB_URL") ?: dotenv["DB_URL"] ?: error("No valid DB_URL or DATABASE_URL found")
+    
+    // Variables to be populated
+    var finalUrl = ""
+    var finalUser = ""
+    var finalPass = ""
+
+    if (!rawUrl.isNullOrBlank()) {
+        try {
+            // Remove jdbc: prefix if present for parsing (though usually it's just postgres://...)
+            val cleanUrl = if (rawUrl.startsWith("jdbc:")) rawUrl.substring(5) else rawUrl
+            val uri = java.net.URI(cleanUrl)
+            
+            val userPass = uri.userInfo?.split(":")
+            val user = userPass?.getOrNull(0) ?: ""
+            val pass = userPass?.getOrNull(1) ?: ""
+            val host = uri.host
+            val port = if (uri.port == -1) 5432 else uri.port
+            val path = uri.path // includes leading /
+            
+            // Reconstruct standard JDBC URL without credentials
+            finalUrl = "jdbc:postgresql://$host:$port$path"
+            finalUser = user
+            finalPass = pass
+            
+            val logger = LoggerFactory.getLogger("DatabaseConfig")
+            logger.info("🔌 Parsed DATABASE_URL: Host=$host Port=$port User=${if(user.isNotEmpty()) "SET" else "NONE"}")
+            
+        } catch (e: Exception) {
+            LoggerFactory.getLogger("DatabaseConfig").warn("⚠️ Failed to parse DATABASE_URL, falling back to direct string: ${e.message}")
+            finalUrl = if (rawUrl.startsWith("jdbc:")) rawUrl else "jdbc:$rawUrl"
+        }
     }
 
-    val dbUser = System.getenv("DB_USER") ?: dotenv["DB_USER"] ?: error("DB_USER is missing")
-    val dbPass = System.getenv("DB_PASSWORD") ?: dotenv["DB_PASSWORD"] ?: error("DB_PASSWORD is missing")
+    // 2. Fallback to decomposed Env Vars (DB_URL, DB_USER, etc)
+    if (finalUrl.isEmpty()) {
+        finalUrl = System.getenv("DB_URL") ?: dotenv["DB_URL"] ?: error("No valid DB_URL or DATABASE_URL found")
+        finalUser = System.getenv("DB_USER") ?: dotenv["DB_USER"] ?: error("DB_USER is missing")
+        finalPass = System.getenv("DB_PASSWORD") ?: dotenv["DB_PASSWORD"] ?: error("DB_PASSWORD is missing")
+    } else {
+        // parsing succeeded, but we might want to allow overrides if specifically set (rare)
+        // If extracted user/pass is empty, try to fill from specific env vars
+        if (finalUser.isEmpty()) finalUser = System.getenv("DB_USER") ?: dotenv["DB_USER"] ?: ""
+        if (finalPass.isEmpty()) finalPass = System.getenv("DB_PASSWORD") ?: dotenv["DB_PASSWORD"] ?: ""
+    }
 
     val logger = LoggerFactory.getLogger("DatabaseConfig")
     try {
-        // Robust parsing to check for private vs public host
-        val host = dbUrl.substringAfter("://").substringBefore(":").substringBefore("/")
-        logger.info("🔌 Database Host: $host")
-        
-        if (host.contains("proxy.rlwy.net", ignoreCase = true)) {
-             logger.warn("⚠️ WARNING: DB host looks like a public TCP proxy ($host). You might incur egress fees! verify configuration.")
-        }
-    } catch (e: Exception) {
-        logger.warn("Could not parse DB Host for verification")
-    }
+        val host = finalUrl.substringAfter("://").substringBefore(":").substringBefore("/")
+        // logger.info("🔌 Database Host: $host") // redundant if parsed above, but keeps consistency
+    } catch (e: Exception) {}
 
     // Connect
     Database.connect(
-        url = dbUrl,
+        url = finalUrl,
         driver = "org.postgresql.Driver",
-        user = dbUser,
-        password = dbPass
+        user = finalUser,
+        password = finalPass
     )
 
     // Create tables if they don't exist
