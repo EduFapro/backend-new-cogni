@@ -60,8 +60,8 @@ fun Route.evaluatorRoutes(service: EvaluatorService) {
 
             get("/{id}") {
                 try {
-                    val id = call.parameters["id"]?.toIntOrNull()
-                    if (id == null) {
+                    val id = call.parameters["id"]
+                    if (id.isNullOrBlank()) {
                         call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid ID"))
                         return@get
                     }
@@ -80,8 +80,8 @@ fun Route.evaluatorRoutes(service: EvaluatorService) {
 
             put("/{id}") {
                 try {
-                    val id = call.parameters["id"]?.toIntOrNull()
-                    if (id == null) {
+                    val id = call.parameters["id"]
+                    if (id.isNullOrBlank()) {
                         call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid ID"))
                         return@put
                     }
@@ -102,8 +102,8 @@ fun Route.evaluatorRoutes(service: EvaluatorService) {
 
             delete("/{id}") {
                 try {
-                    val id = call.parameters["id"]?.toIntOrNull()
-                    if (id == null) {
+                    val id = call.parameters["id"]
+                    if (id.isNullOrBlank()) {
                         call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid ID"))
                         return@delete
                     }

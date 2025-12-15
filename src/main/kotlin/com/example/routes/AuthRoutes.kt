@@ -35,7 +35,7 @@ fun Route.authRoutes() {
         authenticate("auth-jwt") {
             post("/change-password") {
                 val principal = call.principal<JWTPrincipal>()
-                val userId = principal?.payload?.getClaim("id")?.asInt()
+                val userId = principal?.payload?.getClaim("id")?.asString()
 
                 if (userId == null) {
                     call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))

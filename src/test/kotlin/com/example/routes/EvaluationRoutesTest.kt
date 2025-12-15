@@ -31,7 +31,7 @@ class EvaluationRoutesTest {
 
         val evaluation = Evaluation(
             id = 1,
-            evaluatorId = 1,
+            evaluatorId = "uuid-1",
             participantId = 1,
             evaluationDate = "2023-01-01",
             status = 1,
@@ -63,7 +63,7 @@ class EvaluationRoutesTest {
 
         val evaluation = Evaluation(
             id = 1,
-            evaluatorId = 1,
+            evaluatorId = "uuid-1",
             participantId = 1,
             evaluationDate = "2023-01-01",
             status = 1,
@@ -92,7 +92,7 @@ class EvaluationRoutesTest {
 
         val evaluation = Evaluation(
             id = 1,
-            evaluatorId = 1,
+            evaluatorId = "uuid-1",
             participantId = 1,
             evaluationDate = "2023-01-01",
             status = 1,

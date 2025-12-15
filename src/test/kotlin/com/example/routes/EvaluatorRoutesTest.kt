@@ -45,7 +45,7 @@ class EvaluatorRoutesTest {
         }
 
         val evaluator = Evaluator(
-            id = 1,
+            id = "uuid-1",
             name = "John",
             surname = "Doe",
             email = "john.doe@example.com",
@@ -58,7 +58,7 @@ class EvaluatorRoutesTest {
             isAdmin = false
         )
 
-        every { service.create(any()) } returns 1
+        every { service.create(any()) } returns "uuid-1"
 
         val response = client.post("/api/evaluators") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -89,7 +89,7 @@ class EvaluatorRoutesTest {
         }
 
         val evaluator = Evaluator(
-            id = 1,
+            id = "uuid-1",
             name = "John",
             surname = "Doe",
             email = "john.doe@example.com",
@@ -102,15 +102,15 @@ class EvaluatorRoutesTest {
             isAdmin = false
         )
 
-        every { service.getById(1) } returns evaluator
+        every { service.getById("uuid-1") } returns evaluator
 
-        val response = client.get("/api/evaluators/1") {
+        val response = client.get("/api/evaluators/uuid-1") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(response.bodyAsText().contains("johndoe"))
-        verify { service.getById(1) }
+        verify { service.getById("uuid-1") }
     }
 
     @Test
@@ -130,14 +130,14 @@ class EvaluatorRoutesTest {
             }
         }
 
-        every { service.getById(999) } returns null
+        every { service.getById("uuid-999") } returns null
 
-        val response = client.get("/api/evaluators/999") {
+        val response = client.get("/api/evaluators/uuid-999") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
-        verify { service.getById(999) }
+        verify { service.getById("uuid-999") }
     }
 
     @Test
@@ -158,7 +158,7 @@ class EvaluatorRoutesTest {
         }
 
         val evaluator = Evaluator(
-            id = 1,
+            id = "uuid-1",
             name = "John",
             surname = "Doe",
             email = "john.doe@example.com",
@@ -171,9 +171,9 @@ class EvaluatorRoutesTest {
             isAdmin = false
         )
 
-        every { service.update(1, any()) } returns 1
+        every { service.update("uuid-1", any()) } returns 1
 
-        val response = client.put("/api/evaluators/1") {
+        val response = client.put("/api/evaluators/uuid-1") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(Evaluator.serializer(), evaluator))
@@ -181,7 +181,7 @@ class EvaluatorRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(response.bodyAsText().contains("Evaluator updated successfully"))
-        verify { service.update(1, any()) }
+        verify { service.update("uuid-1", any()) }
     }
 
     @Test
@@ -201,14 +201,14 @@ class EvaluatorRoutesTest {
             }
         }
 
-        every { service.delete(1) } returns 1
+        every { service.delete("uuid-1") } returns 1
 
-        val response = client.delete("/api/evaluators/1") {
+        val response = client.delete("/api/evaluators/uuid-1") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(response.bodyAsText().contains("Evaluator deleted successfully"))
-        verify { service.delete(1) }
+        verify { service.delete("uuid-1") }
     }
 }

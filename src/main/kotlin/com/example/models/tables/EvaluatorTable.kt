@@ -3,7 +3,7 @@ package com.example.models.tables
 import org.jetbrains.exposed.sql.Table
 
 object EvaluatorTable : Table("evaluators") {
-    val id = integer("id").autoIncrement()
+    val id = varchar("id", 36)
     val name = varchar("name", 100)
     val surname = varchar("surname", 100)
     val email = varchar("email", 150).uniqueIndex()

@@ -48,7 +48,7 @@ class AuthService {
         return BCrypt.hashpw(password, BCrypt.gensalt())
     }
 
-    fun changePassword(userId: Int, oldPassword: String, newPassword: String): Boolean {
+    fun changePassword(userId: String, oldPassword: String, newPassword: String): Boolean {
         val user = transaction {
             EvaluatorTable.selectAll().where { EvaluatorTable.id eq userId }.singleOrNull()
         } ?: return false

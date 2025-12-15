@@ -90,7 +90,7 @@ class ParticipantService(
             .singleOrNull()
     }
 
-    fun getByEvaluatorId(evaluatorId: Int): List<Participant> = transaction {
+    fun getByEvaluatorId(evaluatorId: String): List<Participant> = transaction {
         ParticipantTable.selectAll().where { ParticipantTable.evaluatorId eq evaluatorId }
             .map { rowToParticipant(it) }
     }

@@ -20,7 +20,7 @@ data class ParticipantCreateDTO(
     val sex: Int,
     val educationLevel: Int,
     val laterality: Int,
-    val evaluatorId: Int,
+    val evaluatorId: String,
     val selectedModuleIds: List<Int> = emptyList()
 )
 
@@ -86,9 +86,9 @@ fun Route.participantRoutes(service: ParticipantService) {
 
             get {
                 try {
-                    val evaluatorId = call.request.queryParameters["evaluatorId"]?.toIntOrNull()
+                    val evaluatorId = call.request.queryParameters["evaluatorId"]
                     
-                    if (evaluatorId != null) {
+                    if (!evaluatorId.isNullOrBlank()) {
                         val participants = service.getByEvaluatorId(evaluatorId)
                         call.respond(HttpStatusCode.OK, participants)
                     } else {

@@ -36,7 +36,7 @@ class ParticipantRoutesTest {
             sex = 2,
             educationLevel = 1,
             laterality = 1,
-            evaluatorId = 1
+            evaluatorId = "uuid-1"
         )
 
         every { service.create(
@@ -76,7 +76,7 @@ class ParticipantRoutesTest {
             sex = 2,
             educationLevel = 1,
             laterality = 1,
-            evaluatorId = 1
+            evaluatorId = "uuid-1"
         )
 
         every { service.getById(1) } returns participant
@@ -107,16 +107,16 @@ class ParticipantRoutesTest {
             sex = 2,
             educationLevel = 1,
             laterality = 1,
-            evaluatorId = 1
+            evaluatorId = "uuid-1"
         )
 
-        every { service.getByEvaluatorId(1) } returns listOf(participant)
+        every { service.getByEvaluatorId("uuid-1") } returns listOf(participant)
 
-        val response = client.get("/api/participants?evaluatorId=1")
+        val response = client.get("/api/participants?evaluatorId=uuid-1")
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(response.bodyAsText().contains("Jane"))
-        verify { service.getByEvaluatorId(1) }
+        verify { service.getByEvaluatorId("uuid-1") }
     }
 
     @Test
@@ -138,7 +138,7 @@ class ParticipantRoutesTest {
             sex = 2,
             educationLevel = 1,
             laterality = 1,
-            evaluatorId = 1
+            evaluatorId = "uuid-1"
         )
 
         every { service.update(1, any()) } returns 1
